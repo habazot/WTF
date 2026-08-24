@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Wine, Clock, Plus, Save, ExternalLink, 
-  CheckCircle, Globe, Eye, MapPin, Search, Info
+  Wine, Clock, Plus, Save, ExternalLink,
+  CheckCircle, Globe, Eye, MapPin, Search, Info, CalendarDays, FileText
 } from 'lucide-react';
 
 const WINE_FOLLY_FLAVORS = [
@@ -164,14 +164,34 @@ const createInitialWine = (index) => ({
   }
 });
 
+const createSession = (wines = [], index = 0) => ({
+  id: `session-${Date.now()}-${index}`,
+  title: `Tasting Session ${index + 1}`,
+  notes: '',
+  createdAt: new Date().toISOString(),
+  startedAt: new Date().toISOString().slice(0, 16),
+  wines,
+});
+
+const formatSessionDate = (dateValue) => {
+  if (!dateValue) return 'No date set';
+  const date = new Date(dateValue);
+  return Number.isNaN(date.getTime())
+    ? 'No date set'
+    : date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+};
+
 export default function WineBlindTastingApp() {
   const [wineCount, setWineCount] = useState(4);
   const [wines, setWines] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [activeSessionId, setActiveSessionId] = useState('');
+  const [isLoaded, setIsLoaded] = useState(false);
   const [activeWineIdx, setActiveWineIdx] = useState(0);
   const [activeStageId, setActiveStageId] = useState('sub-1');
   const [customStageLabel, setCustomStageLabel] = useState('');
   const [customStageMins, setCustomStageMins] = useState(15);
-  const [activeView, setActiveView] = useState('tasting'); // 'tasting' | 'reveal' | 'explorer'
+  const [activeView, setActiveView] = useState('tasting'); // 'tasting' | 'reveal' | 'explorer' | 'sessions'
 
   // Explorer State
   const [selectedRegion, setSelectedRegion] = useState('Bordeaux');
@@ -182,25 +202,74 @@ export default function WineBlindTastingApp() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setWines(parsed);
-        setWineCount(parsed.length);
+        const loadedSessions = Array.isArray(parsed)
+          ? [createSession(parsed, 0)]
+          : parsed.sessions || [];
+        const firstSession = loadedSessions[0] || createSession([], 0);
+        const loadedActiveSession = loadedSessions.find(session => session.id === parsed.activeSessionId) || firstSession;
+        setSessions(loadedSessions.length ? loadedSessions : [firstSession]);
+        setActiveSessionId(loadedActiveSession.id);
+        setWines(loadedActiveSession.wines || []);
+        setWineCount((loadedActiveSession.wines || []).length);
       } catch (e) {
         initWines(4);
       }
     } else {
       initWines(4);
     }
+    setIsLoaded(true);
   }, []);
 
   useEffect(() => {
-    if (wines.length > 0) {
-      localStorage.setItem('wine_blind_tasting_data', JSON.stringify(wines));
+    if (isLoaded && wines.length > 0 && activeSessionId) {
+      setSessions(prev => prev.map(session => (
+        session.id === activeSessionId ? { ...session, wines } : session
+      )));
     }
-  }, [wines]);
+  }, [wines, activeSessionId, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded && sessions.length > 0) {
+      localStorage.setItem('wine_blind_tasting_data', JSON.stringify({ sessions, activeSessionId }));
+    }
+  }, [sessions, activeSessionId, isLoaded]);
 
   const initWines = (count) => {
     const initial = Array.from({ length: count }, (_, i) => createInitialWine(i));
     setWines(initial);
+    const session = createSession(initial, sessions.length);
+    setSessions([session]);
+    setActiveSessionId(session.id);
+  };
+
+  const activeSession = sessions.find(session => session.id === activeSessionId);
+
+  const updateSession = (field, value) => {
+    setSessions(prev => prev.map(session => (
+      session.id === activeSessionId ? { ...session, [field]: value } : session
+    )));
+  };
+
+  const switchSession = (session) => {
+    setActiveSessionId(session.id);
+    setWines(session.wines || []);
+    setWineCount((session.wines || []).length);
+    setActiveWineIdx(0);
+    setActiveStageId('sub-1');
+    setActiveView('tasting');
+  };
+
+  const createNewSession = () => {
+    const newSession = createSession(
+      Array.from({ length: wineCount }, (_, i) => createInitialWine(i)),
+      sessions.length
+    );
+    setSessions(prev => [...prev, newSession]);
+    setActiveSessionId(newSession.id);
+    setWines(newSession.wines);
+    setActiveWineIdx(0);
+    setActiveStageId('sub-1');
+    setActiveView('tasting');
   };
 
   const handleWineCountChange = (newCount) => {
@@ -288,7 +357,7 @@ export default function WineBlindTastingApp() {
     setWines(prev => prev.map((w, idx) => idx === wineIdx ? { ...w, reveal: { ...w.reveal, [field]: val } } : w));
   };
 
-  if (!currentWine && activeView !== 'explorer') return null;
+  if (!currentWine && activeView !== 'explorer' && activeView !== 'sessions') return null;
 
   const activeStage = currentWine?.stages[activeStageId] || (currentWine ? Object.values(currentWine.stages)[0] : null);
   const regionInfo = REGION_DATABASE[selectedRegion] || REGION_DATABASE['Bordeaux'];
@@ -316,6 +385,12 @@ export default function WineBlindTastingApp() {
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 ${activeView === 'explorer' ? 'bg-rose-600 text-white' : 'text-slate-400 hover:text-white'}`}
             >
               <MapPin className="w-3.5 h-3.5" /> Region & Grape Map
+            </button>
+            <button
+              onClick={() => setActiveView('sessions')}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 ${activeView === 'sessions' ? 'bg-rose-600 text-white' : 'text-slate-400 hover:text-white'}`}
+            >
+              <CalendarDays className="w-3.5 h-3.5" /> Sessions
             </button>
             <button
               onClick={() => setActiveView('reveal')}
@@ -360,6 +435,83 @@ export default function WineBlindTastingApp() {
             ))}
           </div>
         </div>
+      )}
+
+      {activeView === 'tasting' && activeSession && (
+        <section className="max-w-6xl mx-auto mb-6 bg-slate-800/80 border border-slate-700 rounded-xl p-4">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_220px] gap-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Session title</label>
+              <input
+                type="text"
+                value={activeSession.title}
+                onChange={(e) => updateSession('title', e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1 flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Date and time</label>
+              <input
+                type="datetime-local"
+                value={activeSession.startedAt || activeSession.createdAt.slice(0, 16)}
+                onChange={(e) => updateSession('startedAt', e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-medium text-slate-300 mb-1 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Session notes</label>
+              <textarea
+                rows="2"
+                value={activeSession.notes}
+                onChange={(e) => updateSession('notes', e.target.value)}
+                placeholder="Who was tasting, what was served, or anything worth remembering..."
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SESSION DIRECTORY */}
+      {activeView === 'sessions' && (
+        <main className="max-w-6xl mx-auto space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-rose-400 font-bold mb-1">Journal archive</p>
+              <h2 className="text-2xl font-bold text-slate-100">Tasting Sessions</h2>
+              <p className="text-sm text-slate-400 mt-1">Open a previous tasting or start a fresh session.</p>
+            </div>
+            <button
+              onClick={createNewSession}
+              className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center justify-center gap-2"
+            >
+              <Plus className="w-4 h-4" /> New Session
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {sessions.map(session => (
+              <div key={session.id} className={`bg-slate-800/80 border rounded-xl p-5 space-y-4 ${session.id === activeSessionId ? 'border-rose-500' : 'border-slate-700'}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-lg font-bold text-slate-100 truncate">{session.title}</h3>
+                    <p className="text-xs text-slate-400 mt-2 flex items-center gap-1.5">
+                      <CalendarDays className="w-3.5 h-3.5" /> {formatSessionDate(session.startedAt || session.createdAt)}
+                    </p>
+                  </div>
+                  {session.id === activeSessionId && <span className="text-[10px] uppercase tracking-wider text-rose-300 border border-rose-700 rounded px-2 py-1">Open</span>}
+                </div>
+                <p className="text-sm text-slate-300 min-h-10 whitespace-pre-wrap">{session.notes || 'No session notes yet.'}</p>
+                <div className="flex items-center justify-between pt-3 border-t border-slate-700">
+                  <span className="text-xs text-slate-400">{session.wines?.length || 0} wines</span>
+                  <button onClick={() => switchSession(session)} className="text-xs font-bold text-rose-400 hover:text-rose-300">
+                    Open session
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
       )}
 
       {/* TASTING VIEW */}
