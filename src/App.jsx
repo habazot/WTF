@@ -4,10 +4,25 @@ import {
   CheckCircle, Globe, Eye, MapPin, Search, Info, CalendarDays, FileText
 } from 'lucide-react';
 
-const WINE_FOLLY_FLAVORS = [
-  'Floral', 'Citrus', 'Tree Fruit', 'Tropical Fruit', 
-  'Red Fruit', 'Black Fruit', 'Herbal / Green', 'Spice', 
-  'Earth / Mineral', 'Oak / Vanilla', 'Butter / Dairy', 'Leather / Tobacco'
+const TASTING_WHEEL_CATEGORIES = [
+  { name: 'Floral', color: '#7778bd', notes: ['Rose', 'Violet', 'Potpourri', 'Hibiscus', 'Jasmine', 'Lavender'] },
+  { name: 'Citrus', color: '#91bd43', notes: ['Lime', 'Lemon', 'Grapefruit', 'Orange', 'Marmalade'] },
+  { name: 'Tree Fruit', color: '#f5a142', notes: ['Quince', 'Apple', 'Pear', 'Nectarine', 'Peach', 'Apricot', 'Persimmon'] },
+  { name: 'Tropical Fruit', color: '#ed4929', notes: ['Pineapple', 'Mango', 'Guava', 'Kiwi', 'Lychee'] },
+  { name: 'Red Fruit', color: '#d94b42', notes: ['Bubblegum', 'Cranberry', 'Red Plum', 'Pomegranate', 'Sour Cherry', 'Strawberry', 'Cherry'] },
+  { name: 'Black Fruit', color: '#912f55', notes: ['Raspberry', 'Boysenberry', 'Black Currant', 'Black Cherry', 'Blackberry', 'Blueberry', 'Olive'] },
+  { name: 'Dried Fruit', color: '#9e678d', notes: ['Raisin', 'Date', 'Fig', 'Prune'] },
+  { name: 'Non-Fruit', color: '#d2b83e', notes: ['Nut', 'Cocoa', 'Coffee', 'Tobacco', 'Leather', 'Meat', 'Smoke'] },
+  { name: 'Spice', color: '#17b7b5', notes: ['White Pepper', 'Black Pepper', 'Cinnamon', 'Clove', 'Anise', 'Nutmeg'] },
+  { name: 'Vegetable', color: '#329b62', notes: ['Bell Pepper', 'Grass', 'Tomato Leaf', 'Black Olive', 'Green Bean', 'Eucalyptus'] },
+  { name: 'Earth', color: '#80a33b', notes: ['Mushroom', 'Truffle', 'Forest Floor', 'Potting Soil', 'Wet Stone'] },
+  { name: 'Microbial', color: '#d6d24f', notes: ['Butter', 'Yogurt', 'Cheese', 'Sourdough', 'Kefir'] },
+  { name: 'Oak Aging', color: '#c59d28', notes: ['Dill', 'Smoke', 'Cigar Box', 'Baking Spices', 'Coconut', 'Vanilla'] },
+  { name: 'General Aging', color: '#d28129', notes: ['Leather', 'Tobacco', 'Dried Flowers', 'Dried Herbs', 'Walnut'] },
+  { name: 'Brett', color: '#b75c40', notes: ['Barnyard', 'Band-Aid', 'Sweaty Horse', 'Mousy'] },
+  { name: 'Cooked', color: '#b84770', notes: ['Jammy', 'Cooked Fruit', 'Stewed Fruit', 'Burnt Sugar'] },
+  { name: 'Volatile Acidity', color: '#9a4e91', notes: ['Vinegar', 'Acetone', 'Nail Polish Remover'] },
+  { name: 'Sulfide & Mercaptan', color: '#bd713d', notes: ['Rubber', 'Matchstick', 'Cabbage', 'Onion', 'Garlic'] },
 ];
 
 const CONTINENTS = [
@@ -15,11 +30,36 @@ const CONTINENTS = [
   'Oceania', 'Africa', 'Asia'
 ];
 
+const WINE_COLORS = [
+  { name: 'Pale Straw', color: '#e9e3b5', group: 'White' }, { name: 'Medium Straw', color: '#e5dc91', group: 'White' }, { name: 'Deep Straw', color: '#d8d477', group: 'White' },
+  { name: 'Pale Yellow', color: '#f4ed9d', group: 'White' }, { name: 'Medium Yellow', color: '#e6df3e', group: 'White' }, { name: 'Deep Yellow', color: '#d8cf16', group: 'White' },
+  { name: 'Pale Gold', color: '#e7d58a', group: 'White' }, { name: 'Medium Gold', color: '#e1bf3d', group: 'White' }, { name: 'Deep Gold', color: '#d79f19', group: 'White' },
+  { name: 'Pale Brown', color: '#d9a94c', group: 'White' }, { name: 'Medium Brown', color: '#a66719', group: 'White' }, { name: 'Deep Brown', color: '#4b2d13', group: 'White' },
+  { name: 'Pale Amber', color: '#e8a936', group: 'White' }, { name: 'Medium Amber', color: '#e87918', group: 'White' }, { name: 'Deep Amber', color: '#bd4b16', group: 'White' },
+  { name: 'Pale Copper', color: '#e5b09d', group: 'Rosé' }, { name: 'Medium Copper', color: '#df765a', group: 'Rosé' }, { name: 'Deep Copper', color: '#ce4d2e', group: 'Rosé' },
+  { name: 'Pale Salmon', color: '#f0aaa0', group: 'Rosé' }, { name: 'Medium Salmon', color: '#e96c5d', group: 'Rosé' }, { name: 'Deep Salmon', color: '#dc4936', group: 'Rosé' },
+  { name: 'Pale Pink', color: '#f2c0c6', group: 'Rosé' }, { name: 'Medium Pink', color: '#e86886', group: 'Rosé' }, { name: 'Deep Pink', color: '#c71948', group: 'Rosé' },
+  { name: 'Pale Ruby', color: '#c22e50', group: 'Red' }, { name: 'Medium Ruby', color: '#8e1836', group: 'Red' }, { name: 'Deep Ruby', color: '#4c0718', group: 'Red' },
+  { name: 'Pale Purple', color: '#bd2863', group: 'Red' }, { name: 'Medium Purple', color: '#870b43', group: 'Red' }, { name: 'Deep Purple', color: '#31051e', group: 'Red' },
+  { name: 'Pale Garnet', color: '#b52b30', group: 'Aged' }, { name: 'Medium Garnet', color: '#7d161c', group: 'Aged' }, { name: 'Deep Garnet', color: '#3e0b0d', group: 'Aged' },
+  { name: 'Pale Tawny', color: '#bd6d39', group: 'Aged' }, { name: 'Medium Tawny', color: '#93451f', group: 'Aged' }, { name: 'Deep Tawny', color: '#552315', group: 'Aged' },
+];
+
+const WineGlass = ({ color, large = false }) => (
+  <span className={`relative block ${large ? 'w-12 h-14' : 'w-9 h-10'}`} aria-hidden="true">
+    <span className="absolute inset-x-1 top-0 h-[70%] overflow-hidden rounded-[45%_45%_50%_50%] border-2 border-slate-300/80 bg-white/10 shadow-inner">
+      <span className="absolute inset-x-0 bottom-0 h-[68%] rounded-[0_0_48%_48%] opacity-90" style={{ backgroundColor: color }} />
+      <span className="absolute left-[22%] top-[8%] h-[55%] w-[12%] rounded-full bg-white/50" />
+    </span>
+    <span className="absolute left-1/2 top-[68%] h-[23%] w-px -translate-x-1/2 bg-slate-300/80" />
+    <span className="absolute bottom-0 left-1/2 h-px w-[70%] -translate-x-1/2 bg-slate-300/80" />
+  </span>
+);
+
 const DEFAULT_SUBSTAGES = [
-  { id: 'sub-1', label: 'Initial Pour', elapsedMinutes: 0 },
-  { id: 'sub-2', label: '5 Minutes In', elapsedMinutes: 5 },
-  { id: 'sub-3', label: '30 Minutes In', elapsedMinutes: 30 },
-  { id: 'sub-4', label: 'Post-Food / +1hr', elapsedMinutes: 60 },
+  { id: 'sub-1', label: 'Immediate', elapsedMinutes: 0 },
+  { id: 'sub-2', label: 'Half Hour', elapsedMinutes: 30 },
+  { id: 'sub-3', label: '2 Hours', elapsedMinutes: 120 },
 ];
 
 // Region Database: Maps & Grapes ranked by popularity
@@ -134,6 +174,7 @@ const createInitialWine = (index) => ({
   id: `wine-${Date.now()}-${index}`,
   number: index + 1,
   color: 'Ruby',
+  translucency: 3,
   isCommitted: false,
   guesses: {
     continent: 'Europe',
@@ -142,10 +183,13 @@ const createInitialWine = (index) => ({
     winery: '',
     grapeVarieties: 'Cabernet Sauvignon',
     vintage: '',
+    alcohol: '',
   },
   stages: DEFAULT_SUBSTAGES.reduce((acc, stage) => {
     acc[stage.id] = {
       elapsedMinutes: stage.elapsedMinutes,
+      color: 'Ruby',
+      translucency: 3,
       noseNotes: {},
       palateNotes: {},
       acidity: 5,
@@ -164,6 +208,26 @@ const createInitialWine = (index) => ({
   }
 });
 
+const normalizeWine = (wine, index) => {
+  const initialWine = createInitialWine(index);
+  return {
+    ...initialWine,
+    ...wine,
+    translucency: wine.translucency || 3,
+    guesses: { ...initialWine.guesses, ...wine.guesses, alcohol: wine.guesses?.alcohol || '' },
+    stages: DEFAULT_SUBSTAGES.reduce((stages, stage) => {
+      stages[stage.id] = {
+        ...initialWine.stages[stage.id],
+        ...(wine.stages?.[stage.id] || {}),
+        elapsedMinutes: stage.elapsedMinutes,
+        color: wine.stages?.[stage.id]?.color || wine.color || initialWine.stages[stage.id].color,
+        translucency: wine.stages?.[stage.id]?.translucency || wine.translucency || 3,
+      };
+      return stages;
+    }, {}),
+  };
+};
+
 const createSession = (wines = [], index = 0) => ({
   id: `session-${Date.now()}-${index}`,
   title: `Tasting Session ${index + 1}`,
@@ -181,6 +245,13 @@ const formatSessionDate = (dateValue) => {
     : date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
 };
 
+const wineFollyGrapeUrl = (grapeName) => {
+  const grapeSlug = grapeName.split(' / ')[0].toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return `https://winefolly.com/grapes/${grapeSlug}/`;
+};
+
 export default function WineBlindTastingApp() {
   const [wineCount, setWineCount] = useState(4);
   const [wines, setWines] = useState([]);
@@ -189,22 +260,27 @@ export default function WineBlindTastingApp() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeWineIdx, setActiveWineIdx] = useState(0);
   const [activeStageId, setActiveStageId] = useState('sub-1');
-  const [customStageLabel, setCustomStageLabel] = useState('');
-  const [customStageMins, setCustomStageMins] = useState(15);
   const [activeView, setActiveView] = useState('tasting'); // 'tasting' | 'reveal' | 'explorer' | 'sessions'
 
   // Explorer State
   const [selectedRegion, setSelectedRegion] = useState('Bordeaux');
   const [selectedGrape, setSelectedGrape] = useState('Cabernet Sauvignon');
+  const [expandedNoseCategory, setExpandedNoseCategory] = useState(null);
+  const [expandedPalateCategory, setExpandedPalateCategory] = useState(null);
+  const [colorPickerWineIdx, setColorPickerWineIdx] = useState(null);
+  const [colorPickerStageId, setColorPickerStageId] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('wine_blind_tasting_data');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const loadedSessions = Array.isArray(parsed)
+        const loadedSessions = (Array.isArray(parsed)
           ? [createSession(parsed, 0)]
-          : parsed.sessions || [];
+          : parsed.sessions || []).map(session => ({
+            ...session,
+            wines: (session.wines || []).map(normalizeWine),
+          }));
         const firstSession = loadedSessions[0] || createSession([], 0);
         const loadedActiveSession = loadedSessions.find(session => session.id === parsed.activeSessionId) || firstSession;
         setSessions(loadedSessions.length ? loadedSessions : [firstSession]);
@@ -302,6 +378,7 @@ export default function WineBlindTastingApp() {
       if (idx !== activeWineIdx) return w;
       return {
         ...w,
+        ...(key === 'color' ? { color: value } : {}),
         stages: {
           ...w.stages,
           [stageId]: { ...w.stages[stageId], [key]: value }
@@ -325,30 +402,6 @@ export default function WineBlindTastingApp() {
     updateStageData(stageId, category, notes);
   };
 
-  const addCustomSubstage = () => {
-    if (!customStageLabel) return;
-    const newId = `sub-${Date.now()}`;
-    const newStageObj = {
-      elapsedMinutes: Number(customStageMins),
-      noseNotes: {},
-      palateNotes: {},
-      acidity: 5,
-      tannins: 5,
-      generalNotes: '',
-    };
-
-    setWines(prev => prev.map((w, idx) => {
-      if (idx !== activeWineIdx) return w;
-      return {
-        ...w,
-        stages: { ...w.stages, [newId]: newStageObj }
-      };
-    }));
-
-    setActiveStageId(newId);
-    setCustomStageLabel('');
-  };
-
   const commitGuesses = () => {
     setWines(prev => prev.map((w, idx) => idx === activeWineIdx ? { ...w, isCommitted: true } : w));
   };
@@ -357,9 +410,67 @@ export default function WineBlindTastingApp() {
     setWines(prev => prev.map((w, idx) => idx === wineIdx ? { ...w, reveal: { ...w.reveal, [field]: val } } : w));
   };
 
+  const renderFlavorCell = (field, stageId) => {
+    const expandedCategory = field === 'noseNotes' ? expandedNoseCategory : expandedPalateCategory;
+    const setExpandedCategory = field === 'noseNotes' ? setExpandedNoseCategory : setExpandedPalateCategory;
+    const stage = currentWine?.stages?.[stageId];
+
+    return <div className="space-y-1.5 min-w-[190px]">
+      {TASTING_WHEEL_CATEGORIES.map(category => {
+        const notes = stage?.[field] || {};
+        const selectedCount = category.notes.filter(note => notes[note]).length;
+        const categoryKey = `${stageId}:${field}:${category.name}`;
+        const isExpanded = expandedCategory === categoryKey;
+
+        return (
+          <div key={category.name} className="rounded-lg border border-slate-700/70 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setExpandedCategory(isExpanded ? null : categoryKey)}
+              className="w-full flex items-center justify-between gap-3 px-3 py-2 text-left text-xs font-semibold transition hover:brightness-110"
+              style={{ backgroundColor: `${category.color}35`, borderLeft: `4px solid ${category.color}` }}
+              aria-expanded={isExpanded}
+            >
+              <span className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: category.color }} />
+                {category.name}
+                {selectedCount > 0 && <span className="text-[10px] text-slate-300">{selectedCount} selected</span>}
+              </span>
+              <span className="text-slate-300 text-base leading-none">{isExpanded ? '−' : '+'}</span>
+            </button>
+
+            {isExpanded && (
+              <div className="flex flex-wrap gap-2 p-3 bg-slate-950/50 border-t border-slate-700/70">
+                {category.notes.map(note => {
+                  const intensity = notes[note] || 0;
+                  const intensitySuffix = intensity === 1 ? '55' : intensity === 2 ? '99' : 'dd';
+                  return (
+                    <button
+                      type="button"
+                      key={note}
+                      onClick={() => toggleFlavorNote(stageId, field, note)}
+                      className="px-2.5 py-1 rounded-full text-xs transition border flex items-center gap-1.5 text-slate-100 hover:brightness-125"
+                      style={{
+                        backgroundColor: intensity ? `${category.color}${intensitySuffix}` : `${category.color}20`,
+                        borderColor: intensity ? category.color : `${category.color}80`,
+                      }}
+                      title={intensity ? `Intensity ${intensity}. Click to increase.` : 'Click to mark as mild.'}
+                    >
+                      {note}
+                      {intensity > 0 && <span className="bg-slate-950/60 px-1.5 py-0.2 rounded-full text-[10px]">{intensity}</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>;
+  };
+
   if (!currentWine && activeView !== 'explorer' && activeView !== 'sessions') return null;
 
-  const activeStage = currentWine?.stages[activeStageId] || (currentWine ? Object.values(currentWine.stages)[0] : null);
   const regionInfo = REGION_DATABASE[selectedRegion] || REGION_DATABASE['Bordeaux'];
   const grapeInfo = GRAPE_DATABASE[selectedGrape] || GRAPE_DATABASE['Cabernet Sauvignon'];
 
@@ -369,7 +480,7 @@ export default function WineBlindTastingApp() {
       <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center pb-6 border-b border-slate-800 mb-6 gap-4">
         <div className="flex items-center gap-3">
           <Wine className="w-8 h-8 text-rose-500" />
-          <h1 className="text-2xl font-bold tracking-tight">Sommelier Blind Tasting Journal</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Wine Tasting Friend</h1>
         </div>
         
         <div className="flex items-center gap-4">
@@ -419,19 +530,24 @@ export default function WineBlindTastingApp() {
         <div className="max-w-6xl mx-auto mb-6 overflow-x-auto pb-2">
           <div className="flex items-center gap-2">
             {wines.map((w, idx) => (
-              <button
-                key={w.id}
-                onClick={() => setActiveWineIdx(idx)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-semibold transition whitespace-nowrap ${
-                  activeWineIdx === idx 
-                    ? 'bg-rose-950/60 border-rose-500 text-rose-200' 
-                    : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:bg-slate-800'
-                }`}
-              >
-                <Wine className="w-4 h-4" />
-                Wine #{w.number}
-                {w.isCommitted && <CheckCircle className="w-4 h-4 text-emerald-400 ml-1" />}
-              </button>
+              <div key={w.id} className="relative">
+                <button
+                  onClick={() => setActiveWineIdx(idx)}
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-semibold transition whitespace-nowrap ${
+                    activeWineIdx === idx
+                      ? 'bg-rose-950/60 border-rose-500 text-rose-200'
+                      : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:bg-slate-800'
+                  }`}
+                >
+                  <span className="w-4 h-4 rounded-full border border-white/70" style={{ backgroundColor: WINE_COLORS.find(color => color.name === w.color)?.color || '#a93645' }} />
+                  Wine #{w.number}
+                  {w.isCommitted && <CheckCircle className="w-4 h-4 text-emerald-400 ml-1" />}
+                </button>
+                <button type="button" onClick={() => setColorPickerWineIdx(colorPickerWineIdx === idx ? null : idx)} title="Choose wine colour" aria-label={`Choose colour for Wine ${w.number}`} className="absolute -right-1 -top-1 w-4 h-4 rounded-full bg-slate-950 border border-slate-400 text-[10px] text-white leading-none">+</button>
+                {colorPickerWineIdx === idx && <div className="absolute z-20 top-full left-0 mt-1 w-[min(26rem,calc(100vw-2rem))] p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-xl grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  {WINE_COLORS.map(wineColor => <button type="button" key={wineColor.name} title={wineColor.name} aria-label={`Set Wine ${w.number} colour to ${wineColor.name}`} onClick={() => { setWines(prev => prev.map((wine, wineIdx) => wineIdx === idx ? { ...wine, color: wineColor.name } : wine)); setColorPickerWineIdx(null); }} className="min-w-0 flex flex-col items-center gap-1 text-center text-[9px] leading-tight text-slate-200 hover:text-white"><WineGlass color={wineColor.color} large /><span className="w-full break-words">{wineColor.name}</span></button>)}
+                </div>}
+              </div>
             ))}
           </div>
         </div>
@@ -516,161 +632,84 @@ export default function WineBlindTastingApp() {
 
       {/* TASTING VIEW */}
       {activeView === 'tasting' && (
-        <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Substage Selector */}
-            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs uppercase tracking-wider text-rose-400 font-bold flex items-center gap-1.5">
-                  <Clock className="w-4 h-4" /> Timed Evaluation Substages
-                </span>
-                <span className="text-xs text-slate-400">Track structural evolution over time</span>
+        <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="lg:col-span-2 bg-slate-800/80 border border-slate-700 rounded-xl p-3">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-3 mb-3">
+              <div>
+                <h3 className="font-semibold text-slate-200 flex items-center gap-2"><Clock className="w-4 h-4 text-rose-400" /> Tasting timeline</h3>
+                <p className="text-[11px] text-slate-400 mt-1">Time runs left to right. Select a category to reveal its outer notes.</p>
               </div>
-
-              <div className="flex flex-wrap gap-2 mb-4">
-                {Object.entries(currentWine.stages).map(([sId, sData]) => (
-                  <button
-                    key={sId}
-                    onClick={() => setActiveStageId(sId)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
-                      activeStageId === sId
-                        ? 'bg-rose-600 border-rose-500 text-white'
-                        : 'bg-slate-900/60 border-slate-700 text-slate-300 hover:border-slate-500'
-                    }`}
-                  >
-                    +{sData.elapsedMinutes}m Stage
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex gap-2 items-center pt-2 border-t border-slate-700/60">
-                <input
-                  type="text"
-                  placeholder="Label (e.g., +45m / Air Exposure)"
-                  value={customStageLabel}
-                  onChange={(e) => setCustomStageLabel(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-xs text-white flex-1"
-                />
-                <input
-                  type="number"
-                  placeholder="Mins"
-                  value={customStageMins}
-                  onChange={(e) => setCustomStageMins(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-xs text-white w-16"
-                />
-                <button
-                  onClick={addCustomSubstage}
-                  className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1 rounded flex items-center gap-1"
-                >
-                  <Plus className="w-3 h-3" /> Add Stage
-                </button>
-              </div>
+              <span className="text-[11px] text-slate-400">Intensity: 1 → 2 → 3 → Off</span>
             </div>
-
-            {/* Flavor Wheel Sensory Profile */}
-            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5 space-y-5">
-              <div className="flex justify-between items-center border-b border-slate-700 pb-3">
-                <h3 className="font-semibold text-slate-200">Wine Folly Sensory Profile</h3>
-                <span className="text-xs text-slate-400">Off → Mild (1) → Medium (2) → Intense (3)</span>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-medium text-rose-300 mb-2.5">Aroma / Nose Notes</h4>
-                <div className="flex flex-wrap gap-2">
-                  {WINE_FOLLY_FLAVORS.map(flavor => {
-                    const intensity = activeStage?.noseNotes?.[flavor] || 0;
-                    return (
-                      <button
-                        key={flavor}
-                        onClick={() => toggleFlavorNote(activeStageId, 'noseNotes', flavor)}
-                        className={`px-2.5 py-1 rounded-full text-xs transition border flex items-center gap-1.5 ${
-                          intensity === 1 ? 'bg-amber-950/80 border-amber-600 text-amber-200' :
-                          intensity === 2 ? 'bg-orange-900/80 border-orange-500 text-orange-200' :
-                          intensity === 3 ? 'bg-rose-900 border-rose-500 text-rose-100 font-bold' :
-                          'bg-slate-900/80 border-slate-700 text-slate-400 hover:border-slate-500'
-                        }`}
-                      >
-                        {flavor}
-                        {intensity > 0 && <span className="bg-slate-950/60 px-1.5 py-0.2 rounded-full text-[10px]">{intensity}</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-medium text-purple-300 mb-2.5">Palate / Taste Notes</h4>
-                <div className="flex flex-wrap gap-2">
-                  {WINE_FOLLY_FLAVORS.map(flavor => {
-                    const intensity = activeStage?.palateNotes?.[flavor] || 0;
-                    return (
-                      <button
-                        key={flavor}
-                        onClick={() => toggleFlavorNote(activeStageId, 'palateNotes', flavor)}
-                        className={`px-2.5 py-1 rounded-full text-xs transition border flex items-center gap-1.5 ${
-                          intensity === 1 ? 'bg-indigo-950/80 border-indigo-600 text-indigo-200' :
-                          intensity === 2 ? 'bg-purple-900/80 border-purple-500 text-purple-200' :
-                          intensity === 3 ? 'bg-rose-900 border-rose-500 text-rose-100 font-bold' :
-                          'bg-slate-900/80 border-slate-700 text-slate-400 hover:border-slate-500'
-                        }`}
-                      >
-                        {flavor}
-                        {intensity > 0 && <span className="bg-slate-950/60 px-1.5 py-0.2 rounded-full text-[10px]">{intensity}</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-700/60">
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-300">Acidity Level</span>
-                    <span className="text-rose-400 font-bold">{activeStage?.acidity || 5} / 10</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={activeStage?.acidity || 5}
-                    onChange={(e) => updateStageData(activeStageId, 'acidity', Number(e.target.value))}
-                    className="w-full accent-rose-500 bg-slate-900 h-2 rounded cursor-pointer"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-300">Tannin Level</span>
-                    <span className="text-rose-400 font-bold">{activeStage?.tannins || 5} / 10</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={activeStage?.tannins || 5}
-                    onChange={(e) => updateStageData(activeStageId, 'tannins', Number(e.target.value))}
-                    className="w-full accent-rose-500 bg-slate-900 h-2 rounded cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Stage Notes</label>
-                <textarea
-                  rows="2"
-                  value={activeStage?.generalNotes || ''}
-                  onChange={(e) => updateStageData(activeStageId, 'generalNotes', e.target.value)}
-                  placeholder="Record structural changes or food pairing observations..."
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white"
-                />
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[760px] border-separate border-spacing-1 text-xs">
+                <thead>
+                  <tr>
+                    <th className="w-28 text-left text-[11px] uppercase tracking-wide text-slate-400 p-2">Tasting note</th>
+                    {Object.entries(currentWine.stages).map(([sId, sData]) => (
+                      <th key={sId} className={`min-w-[220px] p-2 rounded text-left ${activeStageId === sId ? 'bg-rose-950/70 text-rose-200' : 'bg-slate-900 text-slate-300'}`}>
+                        <button type="button" onClick={() => setActiveStageId(sId)} className="font-bold">{sData.elapsedMinutes === 0 ? 'Immediate' : sData.elapsedMinutes === 30 ? 'Half hour' : '2 hours'}</button>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th className="text-left align-top text-slate-300 p-2">Colour</th>
+                    {Object.entries(currentWine.stages).map(([sId, stage]) => (
+                      <td key={sId} className="align-top bg-slate-900/70 rounded p-2">
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setColorPickerStageId(colorPickerStageId === sId ? null : sId)}
+                            className="flex items-center gap-2 text-[10px] text-slate-300 hover:text-white"
+                            aria-label={`Choose colour for ${stage.elapsedMinutes === 0 ? 'Immediate' : stage.elapsedMinutes === 30 ? 'Half hour' : '2 hours'}`}
+                          >
+                            <WineGlass color={WINE_COLORS.find(wineColor => wineColor.name === (stage.color || currentWine.color))?.color || '#a93645'} />
+                            {stage.color || currentWine.color}
+                          </button>
+                          {colorPickerStageId === sId && <div className="absolute z-30 top-full left-0 mt-1 w-[min(26rem,calc(100vw-2rem))] p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-xl grid grid-cols-4 sm:grid-cols-6 gap-2">
+                            {WINE_COLORS.map(wineColor => <button type="button" key={wineColor.name} title={wineColor.name} aria-label={`Set colour to ${wineColor.name}`} onClick={() => { updateStageData(sId, 'color', wineColor.name); setColorPickerStageId(null); }} className="min-w-0 flex flex-col items-center gap-1 text-center text-[9px] leading-tight text-slate-200 hover:text-white"><WineGlass color={wineColor.color} large /><span className="w-full break-words">{wineColor.name}</span></button>)}
+                          </div>}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th className="text-left align-top text-slate-300 p-2">Translucency</th>
+                    {Object.entries(currentWine.stages).map(([sId, stage]) => (
+                      <td key={sId} className="align-top bg-slate-900/70 rounded p-2"><div className="flex gap-1 mb-1">{[1, 2, 3, 4, 5].map(level => <button type="button" key={level} onClick={() => updateStageData(sId, 'translucency', level)} className={`w-5 h-5 rounded-full border ${stage.translucency >= level ? 'bg-rose-400 border-rose-300' : 'bg-slate-950 border-slate-600'}`} aria-label={`Translucency ${level} of 5`} />)}</div><span className="text-[10px] text-slate-400">{stage.translucency || 3} / 5</span></td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th className="text-left align-top text-slate-300 p-2">Aroma</th>
+                    {Object.keys(currentWine.stages).map(sId => <td key={sId} className="align-top bg-slate-900/70 rounded p-2">{renderFlavorCell('noseNotes', sId)}</td>)}
+                  </tr>
+                  <tr>
+                    <th className="text-left align-top text-slate-300 p-2">Taste</th>
+                    {Object.keys(currentWine.stages).map(sId => <td key={sId} className="align-top bg-slate-900/70 rounded p-2">{renderFlavorCell('palateNotes', sId)}</td>)}
+                  </tr>
+                  <tr>
+                    <th className="text-left align-top text-slate-300 p-2">Acidity level</th>
+                    {Object.entries(currentWine.stages).map(([sId, stage]) => <td key={sId} className="align-top bg-slate-900/70 rounded p-2"><input type="range" min="1" max="10" value={stage.acidity || 5} onChange={(e) => updateStageData(sId, 'acidity', Number(e.target.value))} className="w-full accent-rose-500" /><span className="text-rose-300">{stage.acidity || 5} / 10</span></td>)}
+                  </tr>
+                  <tr>
+                    <th className="text-left align-top text-slate-300 p-2">Tannin level</th>
+                    {Object.entries(currentWine.stages).map(([sId, stage]) => <td key={sId} className="align-top bg-slate-900/70 rounded p-2"><input type="range" min="1" max="10" value={stage.tannins || 5} onChange={(e) => updateStageData(sId, 'tannins', Number(e.target.value))} className="w-full accent-rose-500" /><span className="text-rose-300">{stage.tannins || 5} / 10</span></td>)}
+                  </tr>
+                  <tr>
+                    <th className="text-left align-top text-slate-300 p-2">Alcohol level</th>
+                    {Object.entries(currentWine.stages).map(([sId]) => <td key={sId} className="align-top bg-slate-900/70 rounded p-2"><div className="flex items-center gap-1"><input type="number" min="0" max="25" step="0.1" placeholder="13.5" value={currentWine.guesses.alcohol || ''} onChange={(e) => updateGuess('alcohol', e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-white" /><span className="text-slate-400">%</span></div></td>)}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
           {/* Guesses */}
-          <div className="space-y-6">
-            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5 space-y-4">
-              <h3 className="font-semibold text-slate-200 border-b border-slate-700 pb-2 flex items-center gap-2">
+          <div className="space-y-4">
+            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-4 grid grid-cols-2 gap-3">
+              <h3 className="col-span-2 font-semibold text-slate-200 border-b border-slate-700 pb-2 flex items-center gap-2">
                 <Globe className="w-4 h-4 text-rose-400" /> Blind Deductions
               </h3>
 
@@ -761,7 +800,7 @@ export default function WineBlindTastingApp() {
               <button
                 onClick={commitGuesses}
                 disabled={currentWine.isCommitted}
-                className={`w-full py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 ${
+                className={`col-span-2 w-full py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 ${
                   currentWine.isCommitted
                     ? 'bg-emerald-950 border border-emerald-600 text-emerald-300'
                     : 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg'
@@ -857,6 +896,14 @@ export default function WineBlindTastingApp() {
                   <Search className="w-5 h-5 text-rose-400" /> Grape Variety & Global Regions Lookup
                 </h2>
                 <p className="text-xs text-slate-400">Find benchmark regions where specific grape varieties thrive</p>
+                <a
+                  href={wineFollyGrapeUrl(selectedGrape)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-[11px] text-rose-400 hover:text-rose-300 mt-1"
+                >
+                  Open {selectedGrape} on Wine Folly ↗
+                </a>
               </div>
 
               <div className="flex items-center gap-2">
